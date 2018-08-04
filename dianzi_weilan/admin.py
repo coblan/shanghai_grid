@@ -292,6 +292,13 @@ class WorkinspectorPage(TablePage):
                 head['tab_name']='workinspector_form'                
             return head
         
+        def get_operation(self):
+            operations = super().get_operation()
+            for op in operations:
+                if op['name'] == 'add_new':
+                    op['tab_name']='workinspector_form'
+                    break
+            return operations        
         #def dict_row(self, inst):
             #return {
                 #'inspector':';'.join([unicode(x) for x in inst.inspector.all()])
