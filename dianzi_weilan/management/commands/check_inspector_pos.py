@@ -1,15 +1,15 @@
 # encoding:utf-8
 from django.core.management.base import BaseCommand
-from inspector.models import Inspector
+from shanghai_grid.inspector.models import Inspector
 from .. .models import WorkInspector
-from dianzi_weilan.warning import check_inspector,block_list,to_datetime
+from shanghai_grid.dianzi_weilan.warning import check_inspector,block_list,to_datetime
 from django.conf import settings
 from helpers.director.kv import get_value
 from django.utils.timezone import datetime,timedelta
-from dianzi_weilan.port_sangao import getKeeperTrack
+from shanghai_grid.dianzi_weilan.port_sangao import getKeeperTrack
 import json
-from dianzi_weilan.alg.checkpos import outBoxCheck, noPosCheck, removeInvalidPos
-from sangao.cordToLoc import cordToloc
+from shanghai_grid.dianzi_weilan.alg.checkpos import outBoxCheck, noPosCheck, removeInvalidPos
+from shanghai_grid.sangao.cordToLoc import cordToloc
 from django.contrib.gis.geos import Polygon,Point
 
 import logging

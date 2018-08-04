@@ -1,11 +1,11 @@
 # encoding:utf-8
 from django.core.management.base import BaseCommand
-from inspector.models import Inspector
+from shanghai_grid.inspector.models import Inspector
 #from dianzi_weilan.warning import check_inspector
 from django.conf import settings
 #from case_cmp.spider.jiandu import JianDuSpider
 from .. .port.jiandu import JianduPort
-from case_cmp.models import JianduCase
+from shanghai_grid.case_cmp.models import JianduCase
 from django.contrib.gis.geos import Polygon,Point
 from .alg.geo2 import cord2loc
 from django.utils.timezone import datetime, timedelta

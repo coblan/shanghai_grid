@@ -1,8 +1,8 @@
 # encoding:utf-8
 from django.core.management.base import BaseCommand
-from inspector.models import Inspector
+from shanghai_grid.inspector.models import Inspector
 from .. .models import WorkInspector
-from dianzi_weilan.warning import check_inspector,block_list,to_datetime
+from shanghai_grid.dianzi_weilan.warning import check_inspector,block_list,to_datetime
 from django.conf import settings
 from helpers.director.kv import get_value
 from django.utils.timezone import datetime,localtime

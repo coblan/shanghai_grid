@@ -4,11 +4,11 @@ from django.core.management.base import BaseCommand
 from django.conf import settings
 #from case_cmp.spider.ducha import DuchaCaseSpider
 from .. .port.ducha import DuchaPort
-from case_cmp.models import DuchaCase
+from shanghai_grid. case_cmp.models import DuchaCase
+
 import json
 from .alg.geo2 import  cord2loc
 from django.contrib.gis.geos import Polygon,Point
-
 import logging
 log = logging.getLogger('case')
 

@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from django.core.management.base import BaseCommand
 import requests
 import xmltodict
-from inspector.models import Inspector
+from shanghai_grid.inspector.models import Inspector
 from django.conf import settings
 #from .alg.geo import cord2loc
 # 引入第二次的坐标映射算法

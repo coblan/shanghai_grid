@@ -12,7 +12,6 @@ from django.utils import timezone
 from .models import PROC_STATUS
 from shanghai_grid.inspector.models import Inspector
 from helpers.maintenance.update_static_timestamp import js_stamp
-
 # Register your models here.
 class Weilan(BlockGroupTablePage):
     

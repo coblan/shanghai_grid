@@ -2,7 +2,7 @@
 from django.core.management.base import BaseCommand
 import requests
 import xmltodict
-from inspector.models import Inspector
+from shanghai_grid.inspector.models import Inspector
 from django.conf import settings
 from helpers.director.kv import set_value
 from bs4 import BeautifulSoup
@@ -10,6 +10,10 @@ import json
 from django.utils.timezone import datetime
 # import wingdbstub
 class Command(BaseCommand):
+    """
+    这个应该是通过解析html页面，获取监督员的案件，放在kvmodel  inspector_case 里面，便于围栏实时报警
+    ！！现在已经不用这个函数来解析了，应该围栏报警改为从数据库获取数据，然后进行统计。
+    """
     def handle(self, *args, **options):
         self.proxies = getattr(settings,'DATA_PROXY',{})
         
