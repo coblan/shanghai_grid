@@ -28,7 +28,7 @@ class Command(BaseCommand):
             #'inspector':'31189242',
             #'start':'2017121400',
             #'end':'2017121500',
-            'dept':'20601', # 赵项代码
+            'dept':settings.DEPTCODE# 重固 21101, # 赵项代码 '20601'
         }
         
         body="""<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
