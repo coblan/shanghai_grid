@@ -9,6 +9,7 @@ import json
 from django.utils.timezone import datetime,timedelta
 import math
 
+proxies = getattr(settings,'DATA_PROXY',{})
 
 class XunCha(object):
     xuncha_host = getattr(settings,'XUNCHA_HOST')
@@ -24,7 +25,8 @@ class XunCha(object):
         """
         @return:[{polygon:[[1,2],[33,33]],time: "2018-02-08 07:53:21"}]
         """
-        url = urljoin(self.xuncha_host,'forcast?jiezheng=14')
+        xun_code=settings.XUNCHA_CODE
+        url = urljoin(self.xuncha_host,'forcast?jiezheng=%s'%xun_code)
         rt = requests.get(url)
         return json.loads(rt.text)   
     

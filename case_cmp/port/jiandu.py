@@ -21,7 +21,8 @@ class JianduPort(object):
                 'start': self.start,
                 'end': self.end,
                 'page':page, 
-                'perpage':perpage
+                'perpage':perpage,
+                'streetcode':settings.STREET_CODE,
             }
             rt = requests.post(url,data=json.dumps(data), proxies = proxies)
             case_list = json.loads(rt.text)

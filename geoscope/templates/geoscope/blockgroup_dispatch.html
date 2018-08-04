@@ -1,0 +1,166 @@
+{% extends "director/index.html" %}
+{% load static %}
+{% load jsonify %}
+
+{% block page_content %}
+<script src='{% static "js/table.pack.js?t=" %}{{ js_stamp.table_pack_js }}'></script>
+
+<!--<script src="https://cdn.bootcss.com/jszip/3.1.5/jszip.min.js"></script>-->
+<!--<script src="https://cdn.bootcss.com/FileSaver.js/2014-11-29/FileSaver.min.js"></script>-->
+
+<!--<script src="https://cdn.bootcss.com/rasterizehtml/1.2.4/rasterizeHTML.min.js"></script>-->
+
+<!--<script src="https://cdn.bootcss.com/html2canvas/0.5.0-beta4/html2canvas.min.js"></script>-->
+
+<script src='{% static "js/geoinfo.pack.js?t=" %}{{ js_stamp.geoinfo_pack_js }}'></script>
+
+
+<script type="text/javascript">
+
+    //	row_filters=
+    //	placeholder =
+    //	row_sort=
+    //	heads=
+    //	rows=
+    //	row_pages =
+
+    //	can_add=
+    //	can_del=
+    //	search_args=ex.parseSearch()
+    //	search字段从 search_args._q 来取值
+    table_logic={
+        el:'#there',
+        data:{
+            is_fullscreen:false
+//		        heads:heads,
+//		        rows:rows,
+//		        row_filters:row_filters,
+//		        row_sort:row_sort,
+//		        row_pages:row_pages,
+//		        placeholder:placeholder,
+//		        selected:[],
+//		        del_info:[],
+//		        menu:menu,
+//		        can_add:can_add,
+//		        can_del:can_del,
+//		        model:model,
+//		        search_args:search_args,
+//		        ex:ex,
+//            map_panel:this.$refs.map_panel,
+        },
+        mixins:[table_fun],
+        watch:{
+            'row_sort.sort_str':function (v) {
+                this.search_args._sort=v
+                this.search()
+            }
+        },
+        mounted:function(){
+            var self=this
+            this.$refs.map_panel.on_init(function(){
+                self.$refs.disp_panel.init(self.$refs.map_panel)
+            })
+
+        },
+        methods:{
+            toggle_fullscreen:function(){
+                if(this.is_fullscreen){
+                    exit_fullscreen()
+                }else{
+                    fullscreen()
+                }
+               this.is_fullscreen = !this.is_fullscreen
+
+            },
+            fit_view:function(){
+                this.$refs.map_panel.map.setFitView();
+            },
+            auto_shot:function(){
+                // 截屏方式换了，不用这个函数了。
+//                var opts = {useCORS: true};
+//                html2canvas($('#container')[0],opts).then(function(canvas) {
+//                    document.body.appendChild(canvas);
+//                });
+
+//                document.body.appendChild($('.amap-vectors'));
+
+//                var canvas = document.body //document.getElementById("canvas");
+//                rasterizeHTML.drawHTML('Some ' +
+//                        '<span style="color: green; font-size: 20px;">HTML</span>' +
+//                        ' with an image <img src="someimg.png">',
+//                        canvas);
+
+//                shot(document.body,function(img){
+//                    var zip = new JSZip();
+//                    zip.file("smile.jpg", img.src.slice(23), {base64: true})
+//                    zip.generateAsync({type:"blob"})
+//                            .then(function(content){
+//                                saveAs(content, "example.zip");
+//                            })
+//
+//                })
+
+
+            }
+        }
+
+    }
+
+    function convertCanvasToImage(canvas) {
+        var image = new Image();
+        image.src = canvas.toDataURL("image/png");
+        return image;
+    }
+
+    $(function () {
+        table=new Vue(table_logic)
+    })
+
+
+</script>
+
+{% block extra_head %}
+{% endblock %}
+
+<div id='there' style="height: 100%;" class="flex-v">
+    <path-nav :menu='menu' v-if="!search_args._pop"></path-nav>
+
+    <!--没用到filtter暂时屏蔽他-->
+
+    <!--<div class='btn-panel flex flex-sb' style="padding-left:20px; ">-->
+
+        <!--<div v-if="row_filters.length==0" class="flex-grow"></div>-->
+
+        <!--<com-filter class="flex" :heads="row_filters" :search="search_args"-->
+                    <!--&lt;!&ndash;:search_tip='search_tip' @submit="search()"></com-filter>&ndash;&gt;-->
+
+
+        <!--<div class="flex-grow"></div>-->
+        <!-- -->
+    <!--</div>-->
+
+    <!--<com-table class='table fake-suit' :has_check="!search_args._pop" :map="map"-->
+               <!--:row_sort="row_sort" :heads="heads" :rows="rows" v-model="selected"></com-table>-->
+
+
+
+    <!--<paginator :nums='row_pages.options' :crt='row_pages.crt_page' @goto_page='goto_page($event)'></paginator>-->
+
+    <div class="flex flex-grow" >
+        <div class="flex-grow" style="position: relative;">
+            <com-map ref="map_panel"></com-map>
+            <div style="position: absolute;right: 2em;top:2em;">
+                <button @click="toggle_fullscreen()" type="button" class="btn btn-primary">全屏切换</button>
+                <button @click="fit_view()" type="button" class="btn btn-primary">Fit View</button>
+            </div>
+
+        </div>
+        <com-dispatch-panel class="map-btn-panel" :rows="rows" ref="disp_panel"></com-dispatch-panel>
+
+    </div>
+
+</div>
+
+{% block extra %}
+{% endblock %}
+{% endblock %}

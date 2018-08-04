@@ -1,5 +1,5 @@
 from helpers.director.shortcut import TablePage, ModelTable, page_dc, director, RowFilter
-from case_cmp.models import JianduCase
+from shanghai_grid.case_cmp.models import JianduCase
 from django.db.models import F, Q, Case, When
 from django.db.models.aggregates import Count,Sum
 from django.utils.timezone import datetime,timedelta

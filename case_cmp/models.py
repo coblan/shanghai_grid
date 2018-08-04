@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 
 #from django.db import models
 from django.contrib.gis.db import models
-from inspector.models import Inspector
+from shanghai_grid.inspector.models import Inspector
 #from helpers.base.jsonfield import JsonField
 
 # Create your models here.

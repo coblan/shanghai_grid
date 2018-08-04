@@ -1,0 +1,28 @@
+
+.map-btn-panel{
+  width: 20em;
+  margin: 0.5em;
+  background: #ffffff;
+  padding: 0.5em;
+  border: 1px solid #c8c8c8;
+  border-radius: 0.3em;
+
+  .hr{
+    border: 1px solid #dcdcdc;
+    height: 1px;
+    margin: 0.5em 0;
+  }
+  img{
+    max-width: 15em !important;
+  }
+  .sortable{
+    padding: 0;
+  }
+  textarea{
+    width: 100%;
+  }
+  .panel-field{
+    border-bottom: 1px solid #cacaca;
+    padding: 1em 0;
+  }
+}

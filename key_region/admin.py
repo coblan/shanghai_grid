@@ -5,7 +5,7 @@ from django.contrib import admin
 from helpers.director.shortcut import page_dc
 from .alg import polygon2circle
 from .xuncha import XunCha
-from  geoinfo.polygon import dict2poly
+from  shanghai_grid.geoinfo.polygon import dict2poly
 from . import admin_key_region_statistic
 # Register your models here.
 class Forcast(object):

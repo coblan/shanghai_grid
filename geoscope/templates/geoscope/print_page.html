@@ -1,0 +1,52 @@
+{% load static %}
+{% load jsonify %}
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <script src="{% static 'lib/jquery3.2.1.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'lib/font-awesome4.7/font-awesome4.7.min.css' %}">
+    <script src="{% static 'lib/vue2.3.2.js' %}"></script>
+    <title>巡查派遣</title>
+
+    <style type="text/css">
+
+        .A4 {
+            page-break-before: auto;
+            page-break-after: always;
+        }
+    </style>
+    <script>
+        regions={{ regions | jsonify}}
+        $(function(){
+            new Vue({
+                el:'#there',
+                data:{
+                    regions:regions,
+                }
+            })
+        })
+    </script>
+
+</head>
+<style>
+    #there{
+        text-align: center;
+    }
+</style>
+<body>
+<div id="there">
+    <div class="A4" v-for="region in regions">
+        <img v-if="region.shot" :src="region.shot" alt=""/>
+        <span v-else>没有截图，请联系管理员</span>
+        <div>
+            <div v-text="region.desp"></div>
+            <div>生成时间: <span v-text="region.last_time"></span></div>
+            <div>街镇: <span v-text="region.belong"></span></div>
+        </div>
+
+    </div>
+    <!--<div class="A4">第二页</div>-->
+</div>
+
+</body>
+</html>  

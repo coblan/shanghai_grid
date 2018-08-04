@@ -3,14 +3,14 @@ from __future__ import unicode_literals
 from django.contrib import admin
 from helpers.director.shortcut import page_dc,TablePage,FieldsPage,ModelTable,ModelFields,\
      model_dc,RowSearch,RowFilter,director,RowSort
-from geoscope.admin import BlockGroupTablePage,BlockGroupFormPage
-from geoscope.models import BlockGroup,BlockPolygon
+from shanghai_grid.geoscope.admin import BlockGroupTablePage,BlockGroupFormPage
+from shanghai_grid.geoscope.models import BlockGroup,BlockPolygon
 from .models import InspectorGroupAndWeilanRel,OutBlockWarning,WorkInspector
-from inspector.models import InspectorGrop, InspectorWorkGroup
-from geoscope.polygon import poly2dict
+from shanghai_grid.inspector.models import InspectorGrop, InspectorWorkGroup
+from shanghai_grid.geoscope.polygon import poly2dict
 from django.utils import timezone
 from .models import PROC_STATUS
-from inspector.models import Inspector
+from shanghai_grid.inspector.models import Inspector
 from helpers.maintenance.update_static_timestamp import js_stamp
 
 # Register your models here.

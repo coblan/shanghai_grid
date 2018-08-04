@@ -1,0 +1,149 @@
+{% extends "director/index.html" %}
+{% load static %}
+{% load jsonify %}
+
+{% block page_content %}
+
+<script type="text/javascript">
+
+
+    //	heads=
+    //	row =
+    //
+    //
+    //	can_add=
+    //	can_log=
+    //	can_del=
+
+    tabs={{ tabs | jsonify | default:'[]' }}
+    crt_tab = '{{ crt_tab | default:'null' }}'
+    crt_tab = crt_tab || tabs[0].name
+
+    form_logic={
+        el:'#there',
+        data:{
+            tabs:tabs,
+            crt_tab:crt_tab,
+            heads:heads,
+            row:row,
+        },
+        mixins:[field_fun],
+        methods:{
+            item_link:function(name){
+                if(name!=this.crt_tab){
+                    return ex.appendSearch({_tab:name})
+                }else{
+                    return 'javascript:;'
+                }
+            },
+            after_sub:function(row){
+
+                location=ex.appendSearch({pk:row.pk})
+            }
+        }
+    }
+
+    $(function () {
+        new Vue(form_logic)
+    })
+</script>
+
+{% block extra_head %}
+
+{% endblock %}
+
+<div id='there'>
+
+    <div v-if="can_log" style='float: right;padding: 5px 20px;'>
+        <a :href="log_url()">History</a>
+    </div>
+    <path-nav :menu='menu'>
+        <li><span>编辑</span></li>
+    </path-nav>
+
+    <div class="flex">
+        <ul class="nav nav-tabs tabs flex-grow">
+            <li v-for="tab in tabs" :class="{'active':crt_tab==tab.name}"><a :href="item_link(tab.name)" v-text="tab.label" ></a></li>
+        </ul>
+
+        <button @click="submit">保存</button>
+        <button @click="cancel">取消</button>
+
+        <!--<button></button>-->
+        <!--<com-form-btn :submit="submit" :del_row="del_row" :cancel="cancel" :form_bus="this"></com-form-btn>-->
+
+    </div>
+
+
+
+    <!--<div style='overflow: hidden;'>-->
+    <!--<div class="btn-group" style='float: right;'>-->
+    <!--<button type="button" class="btn btn-default" @click='submit()' v-if='can_add'>Save</button>-->
+    <!--<button type="button" class="btn btn-default" v-if='can_del' @click='del_row()'>删除</button>-->
+    <!--<button type="button" class="btn btn-default" @click='cancel()' >Cancel</button>-->
+    <!--</div>-->
+    <!--</div>-->
+
+
+
+    <div class='field-panel'>
+
+        <field  v-for='head in heads' :key="head.name" :head='head' :row='row'></field>
+    </div>
+
+    {% block extra_body %}
+
+    {% endblock %}
+</div>
+
+<style type="text/css">
+    /*.tabs{*/
+        /*align-items: center;*/
+    /*}*/
+    /*.tabs li:first-child{*/
+        /*margin-left: 15px;*/
+    /*}*/
+    /*.tabs li{*/
+        /*display: inline-block;*/
+        /*margin-left:5px;*/
+        /*vertical-align: bottom;*/
+    /*}*/
+
+    /*.nav.tabs>li>a{*/
+        /*padding: 8px 18px 5px 18px;*/
+        /*background-color: #f6f7f8;*/
+        /*border: 1px solid #dddddd;*/
+        /*border-bottom: none;*/
+        /*position: relative;*/
+        /*margin-bottom: 1px;*/
+        /*font-weight: 400;*/
+    /*}*/
+    /*.nav li>a:hover{*/
+        /*text-underline: blue;*/
+        /*text-decoration: underline;*/
+    /*}*/
+
+    /*.nav li.active>a:after{*/
+        /*content: ' ';*/
+        /*position: absolute;*/
+        /*width: 100%;*/
+        /*height: 4px;*/
+        /*bottom: -4px;*/
+        /*left: 0;*/
+        /*background-color: #eee;*/
+    /*}*/
+    /*.nav li.active a{*/
+        /*text-decoration: none;*/
+        /*background-color: #eeeeee;*/
+        /*font-weight: 500;*/
+    /*}*/
+    /*.nav li.active a:hover{*/
+        /*border-bottom: none;*/
+        /*text-decoration: none;*/
+        /*color: #a2a2a2;*/
+        /*font-weight: 500;*/
+        /*background-color: #eeeeee;*/
+    /*}*/
+</style>
+
+{% endblock %}

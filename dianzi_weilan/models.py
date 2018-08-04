@@ -2,9 +2,9 @@
 from __future__ import unicode_literals
 
 from django.db import models
-from inspector.models import InspectorGrop,Inspector
+from shanghai_grid.inspector.models import InspectorGrop,Inspector
 from django.contrib.auth.models import User
-from geoscope.models import BlockPolygon
+from shanghai_grid.geoscope.models import BlockPolygon
 # Create your models here.
 class InspectorGroupAndWeilanRel(models.Model):
     block = models.OneToOneField(BlockPolygon,verbose_name='围栏名称',null=True,blank=True)

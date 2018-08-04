@@ -1,4 +1,4 @@
-from geoinfo.polygon import dict2poly
+from shanghai_grid.geoinfo.polygon import dict2poly
 from django.contrib.gis.geos import Polygon
 import math
 def polygon2circle(polygon):
