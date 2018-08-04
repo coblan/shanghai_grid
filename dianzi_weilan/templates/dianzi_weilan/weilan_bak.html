@@ -1,0 +1,201 @@
+{% extends "jb_admin/table.html" %}
+{% load static %}
+{% load jsonify %}
+
+{% block extra_head %}
+<script src='{% static "js/geoscope.pack.js" %}?t={{ js_stamp.geoscope_pack_js }}'></script>
+<script type="text/javascript">
+
+    //    ex.each(heads,function(head){
+    //        if(head.name=='block'){
+    //            head.editor='com-weilan'
+    //        }
+    //    })
+
+    this_logic={
+//        watch:{
+//            'row_sort.sort_str':function (v) {
+//                this.search_args._sort=v
+//                this.search()
+//            }
+//        },
+        data:{
+
+            js_poly:{}
+
+        },
+        mounted:function(){
+            var self=this
+            var inter_index = setInterval(function(){
+                console.log('hello')
+                var map_com = self.$refs.map_com
+                if(!map_com)return
+                clearInterval(inter_index)
+                map_com.on_init(function(){
+                    ex.each(self.rows,function(row){
+                        self.js_poly[row.pk] = map_com.insert_polygon(row.polygon)
+//                    row.js_poly =
+                    })
+                    map_com.map.setFitView();
+                })
+
+                ex.assign(self.op_funs,{
+                    hight_region:function(kws){
+                        self.hight_region(kws.row)
+                    },
+
+                })
+            },100)
+
+
+        },
+        methods:{
+            hight_region:function(td_row){
+                var row = ex.findone(this.rows,{pk:td_row.pk})
+                var map_com = this.$refs.map_com
+                if(this._old_row && this.js_poly[ this._old_row.pk]){
+                    map_com.remove_highlight_polygon(this.js_poly[this._old_row.pk] )
+                }
+                this._old_row=row
+                map_com.highlight_polygon(this.js_poly[row.pk] ,'white')
+            },
+//            map:function(row,name){
+//                return row[name]
+//            },
+            update_or_insert:function(new_row,old_row){
+                mix_table_data.methods.update_or_insert.call(this,new_row,old_row)
+                if(old_row && ! old_row.pk) {
+                    var map_com = this.$refs.map_com
+                    this.js_poly[new_row.pk] = map_com.insert_polygon(new_row.polygon)
+//                    new_row.js_poly =
+                }
+
+//                if(old_row && ! old_row.pk) {
+//                    var map_com = this.$refs.map_com
+////                    new_row.js_poly = map_com.insert_polygon(new_row.polygon)
+//                    this.rows.splice(0, 0, new_row)
+//                }else{
+//                    var table_row = ex.findone(this.rows,{pk:new_row.pk})
+//                    ex.assign(table_row,new_row)
+//                }
+
+            },
+        }
+
+    }
+    table_logic.mixins = [mix_table_data,mix_v_table_adapter,this_logic]
+</script>
+
+<script>
+    Vue.component('com-weilan',{
+//        props:['name','row'],
+        props:['rowData','field','index'],
+        template:'<span class="clickable"  @click="on_click()" v-text="rowData[field]"></span>',
+        methods:{
+            on_click:function(){
+                this.$root.hight_region(this.rowData)
+            }
+        }
+    })
+</script>
+{% endblock %}
+
+{% block tab-content %}
+<div class="flex flex-grow">
+    <div id="main-page" class="rows-block" v-show="tabgroup.crt =='main'" style="width: 460px">
+        <div class='flex' v-if="row_filters.length > 0" style="min-height: 3em;">
+            <com-filter class="flex" :heads="row_filters" :search_args="search_args"
+                        @submit="search()"></com-filter>
+            <div class="flex-grow"></div>
+        </div>
+        <div class="box box-success">
+            <div class="table-wraper">
+                {% block table-content %}
+                <v-table ref="vtable" is-horizontal-resize
+                         is-vertical-resize
+                         :vertical-resize-offset="80"
+                         :title-row-height="30"
+                         :row-height="24"
+                         odd-bg-color="#f0f6f8"
+                         column-width-drag
+                         @on-custom-comp="on_td_event($event)"
+                         style="width: 100%;"
+                         :columns="columns"
+                         :table-data="rows"
+                         @sort-change="sortChange"
+                         :select-group-change="on_select_group_change"
+                         :select-all="on_select_group_change"
+                         row-hover-color="#eee"
+                         row-click-color="#edf7ff">
+                </v-table>
+                {% endblock %}
+            </div>
+            <div style="margin-top: 10px;">
+                <v-pagination @page-change="get_page($event)"
+                              :total="row_pages.total"
+                              size="small"
+                              :page-size="row_pages.perpage"
+                              @page-size-change="on_perpage_change($event)"
+                              :layout="['total', 'prev', 'pager', 'next', 'sizer', 'jumper']">
+                </v-pagination>
+            </div>
+        </div>
+    </div>
+    <div class="flex-grow" style="position: relative;">
+        <com-map ref="map_com"></com-map>
+    </div>
+</div>
+
+
+
+<!--<div class="flex flex-grow">-->
+<!--<div style="margin: 1em 2em;min-width: 30em;">-->
+<!--<com-table class='table fake-suit' :has_check="!search_args._pop" :map="map"-->
+<!--:row_sort="row_sort" :heads="heads" :rows="rows" v-model="selected"></com-table>-->
+
+<!--<paginator :nums='row_pages.options' :crt='row_pages.crt_page' @goto_page='goto_page($event)'></paginator>-->
+<!--</div>-->
+
+<!--</div>-->
+{% endblock %}
+
+
+
+<!--<div id='there' style="height: 100%;" class="flex-v">-->
+
+<!--&lt;!&ndash;<ol v-if="page_label" class="breadcrumb">&ndash;&gt;-->
+<!--&lt;!&ndash;<b v-text="page_label"></b>&ndash;&gt;-->
+<!--&lt;!&ndash;</ol>&ndash;&gt;-->
+<!--&lt;!&ndash;<path-nav v-else :menu='menu'></path-nav>&ndash;&gt;-->
+
+<!--<div class='btn-panel flex flex-sb' style="padding-left:20px; ">-->
+
+<!--&lt;!&ndash;<div v-if="row_filters.length==0" class="flex-grow"></div>&ndash;&gt;-->
+<!--<com-filter class="flex" :heads="row_filters" :search="search_args"-->
+<!--:search_tip='search_tip' @submit="search()"></com-filter>-->
+<!--<div class="flex-grow"></div>-->
+
+<!--<com-table-btn v-if="!search_args._pop" :add_new="add_new" :del_item="del_item" :table_bus="this">-->
+<!--{% block extra_btn %}-->
+<!--{% endblock %}-->
+<!--</com-table-btn>-->
+
+<!--&lt;!&ndash;<div class='btn-group' style='float: right;' v-if="!search_args._pop">&ndash;&gt;-->
+<!--&lt;!&ndash;<a type="button" class="btn btn-success btn-sm" :href='add_new()' v-if='can_add' role="button">创建</a>&ndash;&gt;-->
+<!--&lt;!&ndash;<button type="button" class="btn btn-danger btn-sm" @click='del_item()' v-if='can_del'>删除</button>&ndash;&gt;-->
+<!--&lt;!&ndash;</div>&ndash;&gt;-->
+
+<!--</div>-->
+
+<!--<div class="flex flex-grow">-->
+<!--<div style="margin: 1em 2em;min-width: 30em;">-->
+<!--<com-table class='table fake-suit' :has_check="!search_args._pop" :map="map"-->
+<!--:row_sort="row_sort" :heads="heads" :rows="rows" v-model="selected"></com-table>-->
+
+<!--<paginator :nums='row_pages.options' :crt='row_pages.crt_page' @goto_page='goto_page($event)'></paginator>-->
+<!--</div>-->
+<!--<div class="flex-grow" style="position: relative;">-->
+<!--<com-map ref="map_com"></com-map>-->
+<!--</div>-->
+<!--</div>-->
+<!--</div>-->

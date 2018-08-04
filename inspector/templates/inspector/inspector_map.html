@@ -1,0 +1,167 @@
+{% extends "jb_admin/table.html" %}
+{% load static %}
+{% load jsonify %}
+
+{% block flag%}
+{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="http://cache.amap.com/lbs/static/main1119.css"/>
+<script src="http://webapi.amap.com/maps?v=1.3&key=您申请的key值&plugin=AMap.PolyEditor,AMap.CircleEditor,AMap.MouseTool"></script>
+
+<!--<script src='{% static "js/table.pack.js?t=" %}{{ js_stamp.table_pack_js }}'></script>-->
+<script src="https://webapi.amap.com/ui/1.0/main.js?v=1.0.11"></script>
+
+<script src='{% static "js/inspector.pack.js" %}?t={{ js_stamp.inspector_pack_js }}'></script>
+<script type="text/javascript">
+    var man_dialog =new ManMapDialog()
+
+    this_logic={
+        data:{
+            selected_man:''
+        },
+        mounted:function(){
+            init_map()
+            this.update_view()
+
+            var self=this
+            var count=0
+            var inter_id = setInterval(function(){
+                $.get('',function(resp){
+                    self.rows=resp.rows
+                    self.update_view()
+                }).fail(function(){
+                    count+=1
+                    if(count>1){
+                        clearInterval(inter_id)
+                    }
+                })
+            },1000*60)
+        },
+        watch:{
+            'row_sort.sort_str':function (v) {
+                this.search_args._sort=v
+                this.search()
+            },
+            selected_man:function(n_val){
+                if(n_val.last_loc){
+                    var pos=n_val.last_loc.split(',')
+                    map.setCenter(pos)
+                    map.setZoom(13)
+                }
+
+            }
+        },
+        methods:{
+            update_view:function(){
+
+                for(var k in markers){
+                    markers[k].hide()
+                }
+
+                ex.each(this.rows,function(row){
+                    update_marker(row)
+                    markers[row.code].show()
+                })
+            },
+
+        }
+
+    }
+    table_logic.mixins=[mix_table_data,this_logic]
+
+</script>
+<style type="text/css" media="screen" id="test">
+
+</style>
+<script>
+
+    function init_map(){
+        window.marker, window.map = new AMap.Map("container", {
+            resizeEnable: true,
+            center: [121.178631,31.167736],
+            zoom: 13
+        });
+    }
+
+
+    markers={}
+    function update_marker(row) {
+        var pair= row.last_loc.split(',')
+        var lon = pair[0]
+        var lat = pair[1]
+        var content=ex.template("{name}/{code}/{track_time}",row) //ex.template("<div><span>{code}</span></div>",{code:row.code})
+        if(!markers[row.code]){
+            var head = row.head || '/static/image/user.jpg'
+            markers[row.code] = new AMap.Marker({
+                icon: "http://webapi.amap.com/theme/v1.3/markers/n/mark_b.png",
+                position: [lon,lat],
+                title:content,
+                content:'<div class="marker"><img class="head" src="'+head+'" alt=""></div>'
+            });
+            var marker = markers[row.code]
+            marker.setMap(map)
+
+            //marker 点击时打开
+            AMap.event.addListener(marker, 'click', function() {
+//                openInfoWin(row,this.getPosition());
+                man_dialog.show_info(row,this.getPosition())
+            });
+
+        }else{
+            markers[row.code].setPosition([lon,lat])
+            markers[row.code].setTitle(content)
+        }
+
+    }
+
+    //    function openInfoWin(man,pos){
+    //        man_dialog.show_info(man,pos)
+    //    }
+
+</script>
+<style>
+    .marker .head{
+        width: 30px;
+        border-radius: 15px;
+    }
+</style>
+{% endblock %}
+
+{% block tab-content %}
+    <!--<path-nav :menu='menu' v-if="!search_args._pop"></path-nav>-->
+    <div class='btn-panel flex flex-sb' style="padding-left:20px; ">
+
+        <!--<div v-if="row_filters.length==0" class="flex-grow"></div>-->
+        <!--<com-filter class="flex" :heads="row_filters" :search="search_args"-->
+                    <!--:search_tip='search_tip' @submit="search()"></com-filter>-->
+        <div class="flex-grow"></div>
+
+        <!--<com-table-btn v-if="!search_args._pop" :add_new="add_new" :del_item="del_item">-->
+            <!--{% block extra_btn %}-->
+            <!--{% endblock %}-->
+        <!--</com-table-btn>-->
+
+
+    </div>
+
+    <!--<com-table class='table fake-suit' :has_check="!search_args._pop" :map="map"-->
+               <!--:row_sort="row_sort" :heads="heads" :rows="rows" v-model="selected"></com-table>-->
+    <!--<paginator :nums='row_pages.options' :crt='row_pages.crt_page' @goto_page='goto_page($event)'></paginator>-->
+
+    <div>
+        <b>监督员:</b>
+        <select name="" id="" v-model="selected_man">
+            <option value="">---</option>
+            <option v-for="man in rows" :value="man" v-text="man.name+' '+man.code"></option>
+        </select>
+        <!--<button @click="">全屏</button>-->
+    </div>
+
+
+
+<div style="position: relative;flex-grow: 10">
+    <div id="container"></div>
+</div>
+
+{% endblock %}

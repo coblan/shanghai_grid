@@ -1,0 +1,124 @@
+{% extends "director/index.html" %}
+{% load static %}
+{% load jsonify %}
+
+{% block page_content %}
+
+<script type="text/javascript">
+
+
+    //	heads=
+    //	row =
+    //
+    //
+    //	can_add=
+    //	can_log=
+    //	can_del=
+    ex.each(heads,function(head){
+        if(head.name=='inspector'){
+            head.type='com-cus-sel'
+        }
+    })
+    groups = {{groups | jsonify }}
+    form_logic={
+        el:'#there',
+//			data:{
+//				kw:{
+//					heads:heads,
+//			        row:row,
+//			   		errors:{},
+//				},
+//				menu:menu,
+//				can_add:can_add,
+//				can_del:can_del,
+//				can_log:can_log,
+//			},
+        data:{
+            groups:groups,
+        },
+        mixins:[field_fun],
+
+    }
+
+    $(function () {
+        new Vue(form_logic)
+    })
+</script>
+
+{% block extra_head %}
+
+{% endblock %}
+
+<div id='there'>
+
+    <div v-if="can_log" style='float: right;padding: 5px 20px;'>
+        <a :href="log_url()">日志</a>
+    </div>
+
+    <ol v-if="page_label" class="breadcrumb">
+        <b v-text="page_label"></b>
+    </ol>
+    <path-nav v-else :menu='menu'></path-nav>
+
+    <com-form-btn :form_bus="this"></com-form-btn>
+
+    <div class='field-panel'>
+
+        <field  v-for='head in kw.heads' :key="head.name" :name='head.name' :kw='kw'></field>
+    </div>
+</div>
+
+<template id="com-cus-sel">
+    <div>
+        <ul v-if='kw.readonly'><li v-for='value in row[name]' v-text='get_label(value)'></li></ul>
+        <div v-else>
+            <span>从监督员分组：</span>
+            <select v-model="crt_group">
+                <option  :value="null">---</option>
+                <option  v-for="group in groups" :value="group" v-text="group.label"></option>
+            </select>
+            <button @click="add_group()">添加</button>
+            <tow-col-sel  v-model='row[name]' :id="'id_'+name" :choices='kw.options' :size='kw.size' ref="two_col_sel"></tow-col-sel>
+        </div>
+
+    </div>
+</template>
+
+<script>
+    var tow_col= {
+        props:['name','row','kw'],
+        data:function(){
+          return {
+              groups:groups,
+              crt_group:null,
+          }
+        },
+        template:'#com-cus-sel',
+        methods:{
+            get_label:function (value) {
+                for(var i =0;i<this.kw.options.length;i++){
+                    if(this.kw.options[i].value==value){
+                        return this.kw.options[i].label
+                    }
+                }
+            },
+            add_group:function(){
+                if(this.crt_group){
+                    var self =this
+                    var tow_col_sel = this.$refs.two_col_sel
+                    ex.each(tow_col_sel.can_select,function(item){
+                        if(ex.isin(item.value,self.crt_group.inspectors)){
+                            tow_col_sel.left_sel.push(item.value)
+                        }
+                    })
+                    tow_col_sel.batch_add()
+                }
+            }
+        }
+    }
+    Vue.component('com-cus-sel',tow_col)
+</script>
+
+<script type=""></script>
+
+{% endblock %}

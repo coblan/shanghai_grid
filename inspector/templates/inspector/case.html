@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{% load static %}
+{% load jsonify %}
+<head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+    <script src="{% static 'lib/jquery3.2.1.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'lib/font-awesome4.7/font-awesome4.7.min.css' %}">
+    <script src="{% static 'lib/vue2.3.2.js' %}"></script>
+
+    <link rel="stylesheet" href="{% static 'lib/bootstrap.min.css' %}">
+    <script src="{% static 'lib/bootstrap.min.js' %}"></script>
+    <script src="{% static 'lib/moment2.17.1.min.js' %}"></script>
+
+    <script src='{% static "js/i18n.js?t=" %}{{ js_stamp.i18n_js }}'></script>
+    <script src='{% static "js/exfun.js?t=" %}{{ js_stamp.exfun_js }}'></script>
+    <!--<script src='{% static "js/uis.pack.js?t=" %}{{ js_stamp.uis_pack_js }}'></script>-->
+    <script src='{% static "js/fields.pack.js?t=" %}{{ js_stamp.fields_pack_js }}'></script>
+
+    <script src='{% static "js/director.pack.js?t=" %}{{ js_stamp.director_pack_js }}'></script>
+
+    {% for js in ex_js %}
+    <script src='{{js}}'></script>
+    {% endfor%}
+
+    <title></title>
+</head>
+
+{% include 'director/reverse.html' %}
+
+<script type="text/javascript">
+    Vue.config.devtools = true
+
+    case_list={{case_list | jsonify}}
+
+
+    $(function () {
+
+        new Vue({
+            el:'#there',
+            data:{
+                case_list:case_list,
+            }
+        })
+
+
+    })
+
+
+</script>
+
+
+<body >
+<div id="there">
+    <table class="table table-hover">
+        <tr>
+            <th v-for="field in case_list[0]"><span v-text="field"></span></th>
+        </tr>
+        <tr v-for="row in case_list.slice(1)">
+            <td v-for="(field,index) in row">
+                <span v-if="index!=1" v-text="field"></span>
+                <a v-else :href='"http://10.231.18.25/CityGrid/CaseOperate_flat/ParticularDisplayInfo.aspx?taskid="+field' target="_blank" v-text="field"></a>
+            </td>
+        </tr>
+    </table>
+</div>
+
+
+
+
+<script type="text/javascript">
+    Vue.component('path-nav',{
+        template:'#path-nav',
+        props:['menu'],
+        methods:{
+            get_active_links:function () {
+                var ls=[]
+                ex.each(this.menu,function(act){
+                    if(act.selected){
+                        ls.push(act)
+                        if(act.submenu){
+                            ex.each(act.submenu,function(sub_act){
+                                if(sub_act.active){
+                                    ls.push(sub_act)
+                                }
+                            })
+                        }
+                    }
+                })
+                return ls
+            }
+        }
+    })
+</script>
+<template id='path-nav'>
+    <ol class="breadcrumb">
+        <li v-for='act in get_active_links()'><span v-text='act.label'></span></li>
+        <slot></slot>
+    </ol>
+</template>
+
+</body>
+</html>

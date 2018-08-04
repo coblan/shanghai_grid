@@ -1,0 +1,22 @@
+.red.circle{
+  background-color: red;
+  width: 20px;
+  height: 20px;
+  border-radius: 10px;
+
+}
+
+.blue.circle{
+  width: 12px;
+  height: 12px;
+  border-radius: 6px;
+  background-color: blue;
+}
+.dark.circle{
+  width: 12px;
+  height: 12px;
+  border-radius: 6px;
+  background-color: #cecdcd;
+  border: 1px solid black;
+  /*opacity: 0.4;*/
+}

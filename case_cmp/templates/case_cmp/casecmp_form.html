@@ -1,0 +1,142 @@
+{% extends "director/index.html" %}
+{% load static %}
+{% load jsonify %}
+
+{% block page_content %}
+<script src='{% static "js/geoscope.pack.js?t=" %}{{ js_stamp.geoscope_pack_js }}'></script>
+<script type="text/javascript">
+
+
+    //	heads=
+    //	row =
+    //
+    //
+    //	can_add=
+    //	can_log=
+    //	can_del=
+    form_logic={
+        el:'#there',
+//			data:{
+//				kw:{
+//					heads:heads,
+//			        row:row,
+//			   		errors:{},
+//				},
+//				menu:menu,
+//				can_add:can_add,
+//				can_del:can_del,
+//				can_log:can_log,
+//			},
+        data:{
+          row:row,
+        },
+        mixins:[field_fun],
+        mounted:function(){
+            var map_com = this.$refs.map_com
+            map_com.on_init(function(){
+                var lon= row.loc[0]
+                var lat =  row.loc[1]
+                var marker = new AMap.Marker({
+                    icon: "http://webapi.amap.com/theme/v1.3/markers/n/mark_b.png",
+                    position: [lon,lat],
+                    title:ex.template('{bigclass}/{litclass}',row),
+                    content:'<div class="red circle"></div>'
+                });
+                marker.setMap(map_com.map)
+
+                AMap.event.addListener(marker, 'click', function() {
+                    var url = ex.template('http://10.231.18.25/INSGRID/caseoperate_flat/XinZeng/EditFeedbackCaseInfo.aspx?KEY={KEY}&TYPE=3&pageindex=0&FanKui=1&sourctType=%E5%8C%BA%E7%BA%A7%E7%9D%A3%E5%AF%9F&categoryId=120',row)
+                    window.open(url)
+                });
+
+                ex.each(row.near_case,function(lcase){
+                    var marker = new AMap.Marker({
+                        icon: "http://webapi.amap.com/theme/v1.3/markers/n/mark_b.png",
+                        position: lcase.loc,
+                        title: ex.template('{bigclass}/{litclass}/{subtime}',lcase),
+                        content:'<div class="blue circle"></div>'
+                    });
+                    marker.setMap(map_com.map)
+
+                    AMap.event.addListener(marker, 'click', function() {
+                        var url = ex.template('http://10.231.18.25/CityGrid/CaseOperate_flat/ParticularDisplayInfo.aspx?taskid={taskid}',lcase)
+                        window.open(url)
+                        this.setContent('<div class="dark circle"></div>')
+                    });
+
+                })
+                map_com.map.setFitView()
+            })
+        }
+
+    }
+
+    $(function () {
+        new Vue(form_logic)
+    })
+</script>
+<style>
+
+    .red.circle{
+        background-color: red;
+        width: 20px;
+        height: 20px;
+        border-radius: 10px;
+
+    }
+
+    .blue.circle{
+        width: 12px;
+        height: 12px;
+        border-radius: 6px;
+        background-color: blue;
+    }
+    .dark.circle{
+        width: 12px;
+        height: 12px;
+        border-radius: 6px;
+        background-color: #cecdcd;
+        border: 1px solid black;
+        /*opacity: 0.4;*/
+    }
+</style>
+{% block extra_head %}
+
+{% endblock %}
+
+<div id='there' style="height: 100%;" class="flex-v">
+
+    <!--<div v-if="can_log" style='float: right;padding: 5px 20px;'>-->
+        <!--<a :href="log_url()">日志</a>-->
+    <!--</div>-->
+
+    <ol v-if="page_label" class="breadcrumb">
+        <b v-text="page_label"></b>
+    </ol>
+    <path-nav v-else :menu='menu'></path-nav>
+
+    <!--<com-form-btn :form_bus="this"></com-form-btn>-->
+
+
+    <div class="flex flex-grow">
+        <div style="margin: 1em 2em;min-width: 30em;">
+            <label for="">案件编号:</label><span v-text="row.taskid"></span><br/>
+            <label for="">案件大类:</label><span v-text="row.bigclass"></span><br/>
+            <label for="">案件小类:</label><span v-text="row.litclass"></span><br/>
+            <label for="">发生地址:</label><span v-text="row.addr"></span><br/>
+            <label for="">发生时间:</label><span v-text="row.subtime"></span><br/>
+            <ul style="overflow: scroll;max-height: 70vh;">
+                <li v-for="pic in row.pic"><img :src="pic" alt="" style="max-width: 300px"/></li>
+            </ul>
+        </div>
+        <div class="flex-grow" style="position: relative;">
+            <com-map ref="map_com"></com-map>
+        </div>
+    </div>
+
+    <!--<div class='field-panel'>-->
+        <!--<field  v-for='head in kw.heads' :key="head.name" :name='head.name' :kw='kw'></field>-->
+    <!--</div>-->
+</div>
+
+{% endblock %}

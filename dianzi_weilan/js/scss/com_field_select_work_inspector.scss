@@ -1,0 +1,12 @@
+.el-transfer-panel{
+  z-index: 1000;
+}
+.select-work-inspector{
+  .el-transfer-panel__body,.el-transfer-panel__list{
+    height: 500px;
+  }
+
+  .el-transfer-panel__item{
+    margin: 0;
+  }
+}

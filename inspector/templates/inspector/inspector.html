@@ -1,0 +1,36 @@
+{% extends "director/table.html" %}
+{% load static %}
+{% load jsonify %}
+
+
+{% block extra_head %}
+
+<script>
+    ex.each(heads,function(head){
+        if(head.name=='head'){
+            head.type='head-img'
+        }
+        if(head.name=='gen'){
+            head.type='com-gen'
+        }
+    })
+
+    Vue.component('head-img',{
+        props:['row','name'],
+        template:"<div class='head'><img v-if='row.head' :src='row.head' /></div>"
+    })
+
+    Vue.component('com-gen',{
+        props:['row','name'],
+        template:"<div><span v-text='row._tr_gen'></span></div>"
+    })
+</script>
+
+<style>
+    .head img{
+        width: 8em;
+    }
+</style>
+
+{% endblock %}
+
