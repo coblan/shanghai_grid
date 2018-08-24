@@ -1,7 +1,7 @@
 # encoding:utf-8
 
 from __future__ import unicode_literals
-from sango.inspector import InspectorCaseConnecter
+#from sango.inspector import InspectorCaseConnecter
 from django.utils.timezone import datetime
 from helpers.director.kv import get_value
 import json
