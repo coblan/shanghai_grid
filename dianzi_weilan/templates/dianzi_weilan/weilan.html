@@ -113,7 +113,7 @@
             <div class="flex-grow"></div>
         </div>
         <div  v-if="ops.length>0">
-            <div class="oprations" v-show="tabgroup.crt == 'main'" style="padding: 5px">
+            <div class="oprations" v-show="tab_stack.length ==0" style="padding: 5px">
                 <component v-for="op in ops"
                            :is="op.editor"
                            :ref="'op_'+op.name"

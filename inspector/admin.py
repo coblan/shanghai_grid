@@ -190,6 +190,9 @@ class InspectorWorkGroupPage(InspectorGroupPage):
     extra_js=['/static/js/inspector.pack.js?t=%s'%js_stamp.inspector_pack_js]
     class tableCls(InspectorGroupPage.tableCls):
         model = InspectorWorkGroup
+        
+        class filters(RowFilter):
+            names = []    
 
 class InspectorWorkGroupForm(ModelFields):
     class Meta:
