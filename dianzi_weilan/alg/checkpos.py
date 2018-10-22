@@ -1,5 +1,5 @@
 
-from inspector.models import Inspector,InspectorWorkGroup
+#from inspector.models import Inspector,InspectorWorkGroup
 from django.utils.timezone import datetime, timedelta
 from dianzi_weilan.models import OutBlockWarning
 from helpers.director.kv import get_value
