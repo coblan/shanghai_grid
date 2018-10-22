@@ -9,7 +9,7 @@ from django.utils.timezone import datetime,timedelta
 from shanghai_grid.dianzi_weilan.port_sangao import getKeeperTrack
 import json
 from shanghai_grid.dianzi_weilan.alg.checkpos import outBoxCheck, noPosCheck, removeInvalidPos
-from shanghai_grid.sangao.cordToLoc import cordToloc
+from shanghai_grid.dianzi_weilan.alg.cord_to_loc import cordToloc
 from django.contrib.gis.geos import Polygon,Point
 
 import logging
