@@ -6,6 +6,7 @@ from helpers.director.shortcut import ModelTable,TablePage,page_dc,FieldsPage,Mo
 from .models import Inspector,InspectorGrop, InspectorWorkGroup
 from helpers.maintenance.update_static_timestamp import js_stamp
 from . import admin_static
+from django.conf import settings
 # Register your models here.
 
 class InspectorPage(TablePage):
@@ -169,6 +170,7 @@ class InspectorGroupForm(ModelFields):
         exclude=[]
         
 class InspectorMapPage(TablePage):
+    """监督员实时坐标"""
     template='inspector/inspector_map.html'
     class InspectorTable(ModelTable):
         model=Inspector
@@ -182,6 +184,12 @@ class InspectorMapPage(TablePage):
         def inn_filter(self, query):
             query = super(self.__class__,self).inn_filter(query)
             return query.exclude(last_loc='NaN').exclude(last_loc='')
+    def get_context(self): 
+        ctx = super().get_context()
+        ctx.update({
+            'map_center': settings.MAP_CENTER,
+        })
+        return ctx
         
         
     tableCls=InspectorTable

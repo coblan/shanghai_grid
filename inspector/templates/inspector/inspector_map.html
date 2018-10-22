@@ -15,6 +15,7 @@
 <script src='{% static "js/inspector.pack.js" %}?t={{ js_stamp.inspector_pack_js }}'></script>
 <script type="text/javascript">
     var man_dialog =new ManMapDialog()
+    var map_center= {{ map_center |jsonify }}
 
     this_logic={
         data:{
@@ -79,7 +80,7 @@
     function init_map(){
         window.marker, window.map = new AMap.Map("container", {
             resizeEnable: true,
-            center: [121.178631,31.167736],
+            center: map_center,
             zoom: 13
         });
     }
