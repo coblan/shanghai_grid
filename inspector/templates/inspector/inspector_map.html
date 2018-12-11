@@ -29,7 +29,7 @@
             var count=0
             var inter_id = setInterval(function(){
                 $.get('',function(resp){
-                    self.rows=resp.rows
+                    self.childStore.rows=resp.rows
                     self.update_view()
                 }).fail(function(){
                     count+=1
@@ -60,7 +60,7 @@
                     markers[k].hide()
                 }
 
-                ex.each(this.rows,function(row){
+                ex.each(this.childStore.rows,function(row){
                     update_marker(row)
                     markers[row.code].show()
                 })
@@ -154,7 +154,7 @@
         <b>监督员:</b>
         <select name="" id="" v-model="selected_man">
             <option value="">---</option>
-            <option v-for="man in rows" :value="man" v-text="man.name+' '+man.code"></option>
+            <option v-for="man in childStore.rows" :value="man" v-text="man.name+' '+man.code"></option>
         </select>
         <!--<button @click="">全屏</button>-->
     </div>
