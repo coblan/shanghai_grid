@@ -25,7 +25,7 @@ class CaseCmpPage(TablePage):
                            #'/static/js/geoscope.pack.js?t=%s'%js_stamp.geoscope_pack_js,
                            ]
         cmpform = CaseCmpFormPage.fieldsCls(crt_user=self.crt_user)
-        ctx['tabs']=[
+        ls=[
             {'name':'cmp',
              'label':'案件比对',
              #'com':'com_tab_fields',
@@ -46,6 +46,7 @@ class CaseCmpPage(TablePage):
              'ops': cmpform.get_operations()                 
              },
         ]
+        ctx['named_ctx'] = {'case_cmp_tabs': ls,}
         return ctx
     
     class tableCls(ModelTable):
@@ -66,6 +67,7 @@ class CaseCmpPage(TablePage):
             if head['name'] == 'taskid':
                 head['editor'] = 'com-table-switch-to-tab'
                 head['tab_name']='cmp'
+                head['ctx_name'] = 'case_cmp_tabs'
             return head
         
         def get_operation(self):
