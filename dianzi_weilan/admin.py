@@ -289,7 +289,8 @@ class WorkinspectorPage(TablePage):
                 head['options']= [{'value': ins.pk, 'label':ins.name } for ins in Inspector.objects.all() ] #{ins.pk:ins.name for ins in Inspector.objects.all()}
             elif head['name']=='date':
                 head['editor'] = 'com-table-switch-to-tab'
-                head['tab_name']='workinspector_form'                
+                head['tab_name']='workinspector_form'  
+                head['ctx_name'] = 'workinspector_tabs'
             return head
         
         def get_operation(self):
@@ -297,8 +298,13 @@ class WorkinspectorPage(TablePage):
             for op in operations:
                 if op['name'] == 'add_new':
                     op['tab_name']='workinspector_form'
+                    op['ctx_name'] = 'workinspector_tabs'
                     break
-            return operations        
+            operations.extend([
+                 {'fun': 'selected_set_and_save', 'editor': 'com-op-btn', 'label': '复制', 'pre_set': 'rt={meta_copy:1}',
+                 'confirm_msg': '确认复制？',  'row_match': 'one_row',},
+            ])
+            return operations 
         #def dict_row(self, inst):
             #return {
                 #'inspector':';'.join([unicode(x) for x in inst.inspector.all()])
@@ -306,10 +312,10 @@ class WorkinspectorPage(TablePage):
     def get_context(self):
         ctx = TablePage.get_context(self)
         wkinsp_form = InspectorWorkScheduleForm(crt_user=self.crt_user)
-        ctx['tabs']=[
+        ls=[
             {'name':'workinspector_form',
              'label':'WorkInspector Form',
-             'com':'com_tab_fields',
+             'com':'com-tab-fields',
              'get_data':{
                  'fun':'get_row',
                  'kws':{
@@ -324,7 +330,12 @@ class WorkinspectorPage(TablePage):
              'ops': wkinsp_form.get_operations()  
              }
         ]
+        ctx['named_ctx'] = {
+            'workinspector_tabs': ls,
+        }
         return ctx
+    
+    
     
 
 #class WorkinspectorFormPage(FieldsPage):
@@ -347,6 +358,17 @@ class InspectorWorkScheduleForm(ModelFields):
             head['editor'] = 'com-field-select-work-inspector' 
             head['groups']= ls
         return head
+    
+    def save_form(self):
+        super().save_form()
+        print('here')
+        if self.kw.get('meta_copy') == 1:
+            # 复制操作
+            
+            bb = WorkInspector.objects.create(date = timezone.now().date() )
+            bb.inspector .add( * list( self.instance.inspector.all() ) )
+            # 返回前端
+            self.instance = bb
     
         
 director.update({

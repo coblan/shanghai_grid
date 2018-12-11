@@ -7,23 +7,35 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
-    <script src="{% static 'lib/jquery3.2.1.min.js' %}"></script>
-    <link rel="stylesheet" href="{% static 'lib/font-awesome4.7/font-awesome4.7.min.css' %}">
-    <script src="{% static 'lib/vue2.3.2.js' %}"></script>
 
-    <link rel="stylesheet" href="{% static 'lib/bootstrap.min.css' %}">
-    <script src="{% static 'lib/bootstrap.min.js' %}"></script>
-    <script src="{% static 'lib/moment2.17.1.min.js' %}"></script>
+    <script src="{{ js_config.js_lib.jquery }}"></script>
+    <link rel="stylesheet" href="{{ js_config.js_lib.font_awesome }}">
+    <script src="{{ js_config.js_lib.vuejs }}"></script>
+    <link rel="stylesheet" href="{{ js_config.js_lib.bootstrap_css }}">
+    <script src="{{ js_config.js_lib.bootstrap }}"></script>
+    <script src="{{ js_config.js_lib.nice_validator }}"></script>
+    <link rel="stylesheet" href="{{ js_config.js_lib.nice_validator_css }}">
+    <script src="{{ js_config.js_lib.exfun }}"></script>
+    <script src="{{ js_config.js_lib.director }}"></script>
+    <script src="{{ js_config.js_lib.jb_admin_pack_js }}"></script>
 
-    <script src='{% static "js/i18n.js?t=" %}{{ js_stamp.i18n_js }}'></script>
-    <script src='{% static "js/exfun.js?t=" %}{{ js_stamp.exfun_js }}'></script>
-    <!--<script src='{% static "js/uis.pack.js?t=" %}{{ js_stamp.uis_pack_js }}'></script>-->
-    <script src='{% static "js/fields.pack.js?t=" %}{{ js_stamp.fields_pack_js }}'></script>
+    <!--<script src="{% static 'lib/jquery3.2.1.min.js' %}"></script>-->
+    <!--<link rel="stylesheet" href="{% static 'lib/font-awesome4.7/font-awesome4.7.min.css' %}">-->
+    <!--<script src="{% static 'lib/vue2.3.2.js' %}"></script>-->
 
-    <script src='{% static "js/director.pack.js?t=" %}{{ js_stamp.director_pack_js }}'></script>
+    <!--<link rel="stylesheet" href="{% static 'lib/bootstrap.min.css' %}">-->
+    <!--<script src="{% static 'lib/bootstrap.min.js' %}"></script>-->
+    <!--<script src="{% static 'lib/moment2.17.1.min.js' %}"></script>-->
+
+    <!--<script src='{% static "js/i18n.js?t=" %}{{ js_stamp.i18n_js }}'></script>-->
+    <!--<script src='{% static "js/exfun.js?t=" %}{{ js_stamp.exfun_js }}'></script>-->
+    <!--&lt;!&ndash;<script src='{% static "js/uis.pack.js?t=" %}{{ js_stamp.uis_pack_js }}'></script>&ndash;&gt;-->
+    <!--<script src='{% static "js/fields.pack.js?t=" %}{{ js_stamp.fields_pack_js }}'></script>-->
+
+    <!--<script src='{% static "js/director.pack.js?t=" %}{{ js_stamp.director_pack_js }}'></script>-->
 
     {% for js in ex_js %}
-    <script src='{{js}}'></script>
+    <!--<script src='{{js}}'></script>-->
     {% endfor%}
 
     <title></title>
@@ -43,6 +55,11 @@
             el:'#there',
             data:{
                 case_list:case_list,
+                heads:[
+                    {name:'taskid',label:'任务号'},
+                    {name:'discovertime',label:'发现时间'},
+                ],
+                rows:case_list
             }
         })
 
@@ -57,14 +74,20 @@
 <div id="there">
     <table class="table table-hover">
         <tr>
-            <th v-for="field in case_list[0]"><span v-text="field"></span></th>
+            <th v-for="head in heads" v-text="head.label"></th>
         </tr>
-        <tr v-for="row in case_list.slice(1)">
-            <td v-for="(field,index) in row">
-                <span v-if="index!=1" v-text="field"></span>
-                <a v-else :href='"http://10.231.18.25/CityGrid/CaseOperate_flat/ParticularDisplayInfo.aspx?taskid="+field' target="_blank" v-text="field"></a>
+        <tr v-for="row in rows">
+            <td v-for="head in heads" >
+                <a v-if="head.name=='taskid'" :href='"http://10.231.18.25/CityGrid/CaseOperate_flat/ParticularDisplayInfo.aspx?taskid="+row.taskid' target="_blank" v-text="row.taskid"></a>
+                <span v-else v-text="row[head.name]"></span>
             </td>
         </tr>
+        <!--<tr v-for="row in case_list.slice(1)">-->
+            <!--<td v-for="(field,index) in row">-->
+                <!--<span v-if="index!=1" v-text="field"></span>-->
+                <!--<a v-else :href='"http://10.231.18.25/CityGrid/CaseOperate_flat/ParticularDisplayInfo.aspx?taskid="+field' target="_blank" v-text="field"></a>-->
+            <!--</td>-->
+        <!--</tr>-->
     </table>
 </div>
 

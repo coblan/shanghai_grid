@@ -58,7 +58,7 @@ class Command(BaseCommand):
                 'addr':row['address'],
                 'loc':Point(x=loc_x,y=loc_y),
                 'pic':json.dumps( image_list ),
-  
+                'KEY': row['id'],
             }
             ls.append(DuchaCase(**data_dc))
             

@@ -4,9 +4,11 @@ from shanghai_grid.geoscope.models import BlockGroup, BlockPolygon
 from django.db.models import F, Q, Case, When
 from django.db.models.aggregates import Count,Sum
 from django.utils.timezone import datetime,timedelta
+from helpers.maintenance.update_static_timestamp import js_stamp_dc
 
 class KeyRegionStatic(TablePage):
     template = 'jb_admin/table.html'
+    extra_js=['/static/js/key_region.pack.js?t=%s'%js_stamp_dc.get('key_region_pack_js','')]
     def get_label(self): 
         return '关键区域案件统计'
     
@@ -30,11 +32,11 @@ class KeyRegionStatic(TablePage):
         def getExtraHead(self): 
             return [
                  {'name': 'total','label': '案件数',}, 
-                 {'name': '0','label': '第一类案件','width':100,'editor':'com-table-html-shower'}, 
-                 {'name': '1','label': '第二类案件','width':100,'editor':'com-table-html-shower'}, 
-                 {'name': '2','label': '第三类案件','width':100,'editor':'com-table-html-shower'}, 
-                 {'name': '3','label': '第四类案件','width':100,'editor':'com-table-html-shower'}, 
-                 {'name': '4','label': '第五类案件','width':100,'editor':'com-table-html-shower'}, 
+                 {'name': '0','label': '第一类案件','width':100,'editor':'com-table-case-num-type'}, 
+                 {'name': '1','label': '第二类案件','width':100,'editor':'com-table-case-num-type'}, 
+                 {'name': '2','label': '第三类案件','width':100,'editor':'com-table-case-num-type'}, 
+                 {'name': '3','label': '第四类案件','width':100,'editor':'com-table-case-num-type'}, 
+                 {'name': '4','label': '第五类案件','width':100,'editor':'com-table-case-num-type'}, #com-table-html-shower 
                  {'name': '5','label': '其他',}, 
                  {'name': 'nums_bujian','label': '部件',}, 
                  {'name': 'nums_shijian','label': '事件',}, 
@@ -69,8 +71,9 @@ class KeyRegionStatic(TablePage):
             pre_num_case = 0
             for index, case in enumerate(q1):
                 pre_num_case += case.get('nums_case')
-                out[str(index)] = '''<div style="text-align:center"><span>%s</span><br><span style="color:gray;font-size:70%%;">%s</span></div>''' \
-                    % (case.get('nums_case'), case.get('litclass') )
+                out[str(index)] = '%s/%s'% (case.get('nums_case'), case.get('litclass') )
+                #out[str(index)] = '''<div style="text-align:center"><span>%s</span><br><span style="color:gray;font-size:70%%;">%s</span></div>''' \
+                    #% (case.get('nums_case'), case.get('litclass') )
                 if index >= 5:
                     out['5'] = total - pre_num_case
                     break
@@ -104,7 +107,12 @@ class KeyRegionStatic(TablePage):
                    #.annotate(nums_normal = F('nums_case') - F('nums_simple'))\
                    #.annotate(nums_bujian = Count(Case(When(infotypeid = 0, then= 1))))\
                    #.annotate(nums_shijian = Count(Case(When(infotypeid = 1, then= 1))))\
-              
+        def get_operation(self):
+            ops = super().get_operation()
+            ops.extend([
+                 {'fun': 'export_excel', 'editor': 'com-op-btn', 'label': '导出Excel', 'icon': 'fa-file-excel-o', }
+            ])
+            return ops
         
         class filters(RowFilter):
             range_fields = ['subtime']

@@ -1,6 +1,6 @@
 # encoding:utf-8
 from __future__ import unicode_literals
-from inspector.models import Inspector
+from shanghai_grid.inspector.models import Inspector
 from django.contrib.gis.geos import Polygon,Point
 from .models import OutBlockWarning,WorkInspector
 from django.utils.timezone import datetime,make_aware
