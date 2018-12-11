@@ -1,5 +1,5 @@
 
-#from inspector.models import Inspector,InspectorWorkGroup
+from shanghai_grid.inspector.models import Inspector,InspectorWorkGroup
 from django.utils.timezone import datetime, timedelta
 from shanghai_grid.dianzi_weilan.models import OutBlockWarning
 from helpers.director.kv import get_value
