@@ -6,9 +6,9 @@
 /******/ 	function __webpack_require__(moduleId) {
 /******/
 /******/ 		// Check if module is in cache
-/******/ 		if(installedModules[moduleId]) {
+/******/ 		if(installedModules[moduleId])
 /******/ 			return installedModules[moduleId].exports;
-/******/ 		}
+/******/
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = installedModules[moduleId] = {
 /******/ 			i: moduleId,
@@ -32,6 +32,9 @@
 /******/
 /******/ 	// expose the module cache
 /******/ 	__webpack_require__.c = installedModules;
+/******/
+/******/ 	// identity function for calling harmony imports with the correct context
+/******/ 	__webpack_require__.i = function(value) { return value; };
 /******/
 /******/ 	// define getter function for harmony exports
 /******/ 	__webpack_require__.d = function(exports, name, getter) {
@@ -60,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 0);
+/******/ 	return __webpack_require__(__webpack_require__.s = 10);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -70,34 +73,266 @@
 "use strict";
 
 
-var _polygon_com = __webpack_require__(1);
+Vue.component('com-tab-block-in-map', {
+    props: ['tab_head', 'par_row'],
+    data: function data() {
+        window.controller = new PolygonGroupController();
+        return {
+            controller: controller
+        };
+    },
 
-var polygon_com = _interopRequireWildcard(_polygon_com);
+    mixins: [field_fun],
+    mounted: function mounted() {
+        init_map();
+        controller.set_drawer(drawer);
+        debugger;
+        controller.set_group(this.par_row.pk);
+        controller.get_items();
+        map.on('click', function () {
+            controller.map_click_callback();
+        });
+    },
+    methods: {
+        item_link: function item_link(name) {
+            if (name != this.crt_tab) {
+                return ex.appendSearch({ _tab: name });
+            } else {
+                return 'javascript:;';
+            }
+        },
+        toggle_fullscreen: function toggle_fullscreen() {
+            if (this.is_fullscreen) {
+                exit_fullscreen();
+            } else {
+                fullscreen();
+            }
+            this.is_fullscreen = !this.is_fullscreen;
+        }
 
-var _polygon_multi_com = __webpack_require__(2);
+    },
+    template: '<div class="flex flex-grow" style="position: absolute;top:0;left: 0;right: 0;bottom: 0;">\n        <div class="flex-grow" style="position: relative;">\n            <div id="container"></div>\n\n            <div style="position: absolute;right: 2em;top:2em;">\n                <button @click="toggle_fullscreen()" type="button" class="btn btn-primary">\u5168\u5C4F\u5207\u6362</button>\n            </div>\n        </div>\n\n        <polygon-multi-btn-panel class="map-btn-panel" :crt_row="controller.crt_row" :items="controller.items" @new_row="controller.new_row()"></polygon-multi-btn-panel>\n    </div>'
+});
 
-var _map_com = __webpack_require__(3);
+function init_map() {
+    window.editorTool, window.map = new AMap.Map("container", {
+        resizeEnable: true,
+        center: [121.159647, 31.157344], //地图中心点
+        zoom: 13 //地图显示的缩放级别
+    });
+    window.mouseTool = new AMap.MouseTool(map);
+    //        map.setMapStyle('amap://styles/light');
+    window.drawer = {
+        callback: function callback(polygon) {
+            console.log(polygon); //获取路径/范围
+        },
+        show: function show() {
+            there_com.show_map = true;
+            setTimeout(function () {
+                map.setFitView();
+            }, 100);
+        },
+        create_polygon: function create_polygon(callback) {
 
-var _fullscreen = __webpack_require__(4);
+            this.callback = callback || this.callback;
+            mouseTool.polygon();
+        },
+        insert_polygon: function insert_polygon(arr) {
+            this._polygon = new AMap.Polygon({
+                map: map,
+                path: arr,
+                strokeOpacity: 1,
+                fillOpacity: 0.2,
+                strokeWeight: 1,
+                strokeColor: "#000000",
+                fillColor: "#999"
+            });
+            return this._polygon;
+        },
+        edit_polygon: function edit_polygon(polygon) {
+            if (this._polygonEditor) {
+                this._polygonEditor.close();
+            }
+            this._polygonEditor = new AMap.PolyEditor(map, polygon);
+            this._polygonEditor.open();
+        },
+        close_polygon: function close_polygon() {
+            if (this._polygonEditor) {
+                this._polygonEditor.close();
+            }
+        },
+        submit: function submit() {
+            // 需要设置 drawer.onsubmit
+            var polygon_path = this._polygon.getPath();
+            this.onsubmit(polygon_path);
+        }
+    };
 
-var dispatch = _interopRequireWildcard(_fullscreen);
-
-var _shot = __webpack_require__(5);
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-//import  {dispatch_panel} from './dispatch_panel_com.js'
-__webpack_require__(6);
-
-Vue.component('polygon-input', polygon_com.ploygon_editor);
-Vue.component('polygon-multi-btn-panel', _polygon_multi_com.polygon_multi_btn_panel);
-
-//Vue.component('com-dispatch-panel',dispatch_panel)
-
-window.PolygonGroupController = _polygon_multi_com.PolygonGroupController;
+    AMap.event.addListener(mouseTool, 'draw', function (e) {
+        //添加事件
+        //        console.log(e.obj.getPath());//获取路径/范围
+        drawer.callback(e.obj.getPath());
+        mouseTool.close(true);
+    });
+}
 
 /***/ }),
 /* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.fullscreen = fullscreen;
+function fullscreen() {
+    $('#menu').hide();
+    $('.map-btn-panel').hide();
+    $('#head').hide();
+    $('.breadcrumb').hide();
+    $('#footer').hide();
+    $('.btn-panel').hide();
+    $('.tabs-bar').hide();
+}
+function exit_fullscreen() {
+    $('#menu').show();
+    $('.map-btn-panel').show();
+    $('#head').show();
+    $('.breadcrumb').show();
+    $('#footer').show();
+    $('.btn-panel').show();
+    $('.tabs-bar').show();
+}
+
+window.fullscreen = fullscreen;
+window.exit_fullscreen = exit_fullscreen;
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+/*分发页面的地图组件
+*
+* */
+
+var map_com = exports.map_com = {
+    template: "<div id=\"container\"></div>",
+    mounted: function mounted() {
+        var self = this;
+        self.init();
+        //ex.load_css("http://cache.amap.com/lbs/static/main1119.css")
+        //ex.load_js("http://webapi.amap.com/maps?v=1.3&key=0909294a753dfe00a0aa124b6ecb93eb&plugin=AMap.PolyEditor,AMap.CircleEditor,AMap.MouseTool",function(){
+        //    ex.load_js("http://cache.amap.com/lbs/static/addToolbar.js",function(){
+        //        setTimeout(function(){
+        //            self.init()
+        //        },10)
+        //    })
+        //})
+    },
+    data: function data() {
+        return {
+            ploygons: [],
+            _load_finish: false
+        };
+    },
+    methods: {
+        on_init: function on_init(callback) {
+            this.on_init_call = callback;
+            if (this._load_finish) {
+                this.on_init_call();
+            }
+        },
+        on_polygon_click: function on_polygon_click(callback) {
+            this.on_polygon_click_callback = callback;
+        },
+        init: function init() {
+            this.editorTool, this.map = new AMap.Map(this.$el, {
+                resizeEnable: true,
+                center: [116.403322, 39.900255], //地图中心点
+                zoom: 13 //地图显示的缩放级别
+            });
+            if (this.on_init_call) {
+                this.on_init_call();
+            }
+            this._load_finish = true;
+            //this.map.setMapStyle('amap://styles/light');
+        },
+        insert_polygon: function insert_polygon(arr) {
+            var self = this;
+            var _polygon = new AMap.Polygon({
+                map: this.map,
+                path: arr,
+                strokeOpacity: 1,
+                fillOpacity: 0.2,
+                strokeWeight: 1,
+                strokeColor: "#555",
+                fillColor: "#777"
+            });
+            this.ploygons.push(_polygon);
+            _polygon.on('click', function () {
+                if (self.on_polygon_click_callback) {
+                    self.on_polygon_click_callback(_polygon);
+                }
+            });
+            return _polygon;
+        },
+        detach_polygon: function detach_polygon(poly) {
+            poly.setMap(null);
+        },
+        add_polygon: function add_polygon(poly) {
+            poly.setMap(this.map);
+        },
+        highlight_polygon: function highlight_polygon(poly, color) {
+            color = color || 'white';
+            poly.setOptions({
+                fillColor: color,
+                strokeWeight: 3,
+                strokeColor: "red"
+            });
+        },
+        remove_highlight_polygon: function remove_highlight_polygon(poly, color) {
+            color = color || '#777';
+            poly.setOptions({
+                strokeWeight: 1,
+                strokeColor: "#000000",
+                fillColor: color
+            });
+        }
+
+    }
+
+    //Vue.component('com-map',map_com)
+
+};Vue.component('com-map', function (resolve, reject) {
+    //ex.load_css("http://cache.amap.com/lbs/static/main1119.css")
+    //ex.load_js("http://webapi.amap.com/maps?v=1.3&key=0909294a753dfe00a0aa124b6ecb93eb&plugin=AMap.PolyEditor,AMap.CircleEditor,AMap.MouseTool",function(){
+    //    ex.load_js("http://cache.amap.com/lbs/static/addToolbar.js",function(){
+    //        resolve(map_com)
+    //    })
+    //})
+
+    ex.load_css(cfg.js_lib.gaode_css);
+    ex.load_js(cfg.js_lib.gaode_js, function () {
+        ex.load_js(cfg.js_lib.gaode_addtoolbar_js, function () {
+            resolve(map_com);
+        });
+    });
+
+    //ex.load_js(cfg.js_lib.geoscope_pack_js,function(){
+    //    resolve(com_tab_case_cmp)
+    //})
+});
+
+/***/ }),
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -153,7 +388,7 @@ var ploygon_editor = exports.ploygon_editor = {
 };
 
 /***/ }),
-/* 2 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -322,6 +557,10 @@ var polygon_multi_btn_panel = exports.polygon_multi_btn_panel = {
             var self = this;
             var row = {};
             ex.assign(row, this.crt_row);
+            if (!row.group) {
+                row.group = controller.group_pk;
+            }
+            debugger;
             if (!row.poly) {
                 alert('请创建一个多边形');
                 return;
@@ -412,162 +651,6 @@ var polygon_multi_btn_panel = exports.polygon_multi_btn_panel = {
 };
 
 /***/ }),
-/* 3 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-/*分发页面的地图组件
-*
-* */
-
-var map_com = exports.map_com = {
-    template: "<div id=\"container\"></div>",
-    mounted: function mounted() {
-        var self = this;
-        self.init();
-        //ex.load_css("http://cache.amap.com/lbs/static/main1119.css")
-        //ex.load_js("http://webapi.amap.com/maps?v=1.3&key=0909294a753dfe00a0aa124b6ecb93eb&plugin=AMap.PolyEditor,AMap.CircleEditor,AMap.MouseTool",function(){
-        //    ex.load_js("http://cache.amap.com/lbs/static/addToolbar.js",function(){
-        //        setTimeout(function(){
-        //            self.init()
-        //        },10)
-        //    })
-        //})
-    },
-    data: function data() {
-        return {
-            ploygons: [],
-            _load_finish: false
-        };
-    },
-    methods: {
-        on_init: function on_init(callback) {
-            this.on_init_call = callback;
-            if (this._load_finish) {
-                this.on_init_call();
-            }
-        },
-        on_polygon_click: function on_polygon_click(callback) {
-            this.on_polygon_click_callback = callback;
-        },
-        init: function init() {
-            this.editorTool, this.map = new AMap.Map(this.$el, {
-                resizeEnable: true,
-                center: [116.403322, 39.900255], //地图中心点
-                zoom: 13 //地图显示的缩放级别
-            });
-            if (this.on_init_call) {
-                this.on_init_call();
-            }
-            this._load_finish = true;
-            //this.map.setMapStyle('amap://styles/light');
-        },
-        insert_polygon: function insert_polygon(arr) {
-            var self = this;
-            var _polygon = new AMap.Polygon({
-                map: this.map,
-                path: arr,
-                strokeOpacity: 1,
-                fillOpacity: 0.2,
-                strokeWeight: 1,
-                strokeColor: "#555",
-                fillColor: "#777"
-            });
-            this.ploygons.push(_polygon);
-            _polygon.on('click', function () {
-                if (self.on_polygon_click_callback) {
-                    self.on_polygon_click_callback(_polygon);
-                }
-            });
-            return _polygon;
-        },
-        detach_polygon: function detach_polygon(poly) {
-            poly.setMap(null);
-        },
-        add_polygon: function add_polygon(poly) {
-            poly.setMap(this.map);
-        },
-        highlight_polygon: function highlight_polygon(poly, color) {
-            color = color || 'white';
-            poly.setOptions({
-                fillColor: color,
-                strokeWeight: 3,
-                strokeColor: "red"
-            });
-        },
-        remove_highlight_polygon: function remove_highlight_polygon(poly, color) {
-            color = color || '#777';
-            poly.setOptions({
-                strokeWeight: 1,
-                strokeColor: "#000000",
-                fillColor: color
-            });
-        }
-
-    }
-};
-
-//Vue.component('com-map',map_com)
-
-Vue.component('com-map', function (resolve, reject) {
-    //ex.load_css("http://cache.amap.com/lbs/static/main1119.css")
-    //ex.load_js("http://webapi.amap.com/maps?v=1.3&key=0909294a753dfe00a0aa124b6ecb93eb&plugin=AMap.PolyEditor,AMap.CircleEditor,AMap.MouseTool",function(){
-    //    ex.load_js("http://cache.amap.com/lbs/static/addToolbar.js",function(){
-    //        resolve(map_com)
-    //    })
-    //})
-
-    ex.load_css(cfg.js_lib.gaode_css);
-    ex.load_js(cfg.js_lib.gaode_js, function () {
-        ex.load_js(cfg.js_lib.gaode_addtoolbar_js, function () {
-            resolve(map_com);
-        });
-    });
-
-    //ex.load_js(cfg.js_lib.geoscope_pack_js,function(){
-    //    resolve(com_tab_case_cmp)
-    //})
-});
-
-/***/ }),
-/* 4 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-exports.fullscreen = fullscreen;
-function fullscreen() {
-    $('#menu').hide();
-    $('.map-btn-panel').hide();
-    $('#head').hide();
-    $('.breadcrumb').hide();
-    $('#footer').hide();
-    $('.btn-panel').hide();
-    $('.tabs-bar').hide();
-}
-function exit_fullscreen() {
-    $('#menu').show();
-    $('.map-btn-panel').show();
-    $('#head').show();
-    $('.breadcrumb').show();
-    $('#footer').show();
-    $('.btn-panel').show();
-    $('.tabs-bar').show();
-}
-
-window.fullscreen = fullscreen;
-window.exit_fullscreen = exit_fullscreen;
-
-/***/ }),
 /* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -644,8 +727,8 @@ if(content.locals) module.exports = content.locals;
 if(false) {
 	// When the styles change, update the <style> tags
 	if(!content.locals) {
-		module.hot.accept("!!./../../../../../../coblan/webcode/node_modules/.0.26.1@css-loader/index.js!./../../../../../../coblan/webcode/node_modules/.6.0.0@sass-loader/lib/loader.js!./map_btn_panel.scss", function() {
-			var newContent = require("!!./../../../../../../coblan/webcode/node_modules/.0.26.1@css-loader/index.js!./../../../../../../coblan/webcode/node_modules/.6.0.0@sass-loader/lib/loader.js!./map_btn_panel.scss");
+		module.hot.accept("!!../../../../../../../coblan/webcode/node_modules/css-loader/index.js!../../../../../../../coblan/webcode/node_modules/sass-loader/lib/loader.js!./map_btn_panel.scss", function() {
+			var newContent = require("!!../../../../../../../coblan/webcode/node_modules/css-loader/index.js!../../../../../../../coblan/webcode/node_modules/sass-loader/lib/loader.js!./map_btn_panel.scss");
 			if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 			update(newContent);
 		});
@@ -741,7 +824,7 @@ var stylesInDom = {},
 		};
 	},
 	isOldIE = memoize(function() {
-		return /msie [6-9]\b/.test(window.navigator.userAgent.toLowerCase());
+		return /msie [6-9]\b/.test(self.navigator.userAgent.toLowerCase());
 	}),
 	getHeadElement = memoize(function () {
 		return document.head || document.getElementsByTagName("head")[0];
@@ -975,6 +1058,43 @@ function updateLink(linkElement, obj) {
 		URL.revokeObjectURL(oldSrc);
 }
 
+
+/***/ }),
+/* 10 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _polygon_com = __webpack_require__(3);
+
+var polygon_com = _interopRequireWildcard(_polygon_com);
+
+var _polygon_multi_com = __webpack_require__(4);
+
+var _map_com = __webpack_require__(2);
+
+var _fullscreen = __webpack_require__(1);
+
+var dispatch = _interopRequireWildcard(_fullscreen);
+
+var _shot = __webpack_require__(5);
+
+var _com_tab_block_in_map = __webpack_require__(0);
+
+var com_tab_block_in_map = _interopRequireWildcard(_com_tab_block_in_map);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+//import  {dispatch_panel} from './dispatch_panel_com.js'
+__webpack_require__(6);
+
+Vue.component('polygon-input', polygon_com.ploygon_editor);
+Vue.component('polygon-multi-btn-panel', _polygon_multi_com.polygon_multi_btn_panel);
+
+//Vue.component('com-dispatch-panel',dispatch_panel)
+
+window.PolygonGroupController = _polygon_multi_com.PolygonGroupController;
 
 /***/ })
 /******/ ]);

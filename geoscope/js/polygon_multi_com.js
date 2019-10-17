@@ -188,6 +188,10 @@ export var polygon_multi_btn_panel={
             var self=this
             var row={}
             ex.assign(row,this.crt_row)
+            if(!row.group){
+                row.group = controller.group_pk
+            }
+            debugger
             if(!row.poly){
                 alert('请创建一个多边形')
                 return
