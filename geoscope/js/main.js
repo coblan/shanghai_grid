@@ -13,3 +13,5 @@ Vue.component('polygon-multi-btn-panel',polygon_multi_btn_panel)
 //Vue.component('com-dispatch-panel',dispatch_panel)
 
 window.PolygonGroupController=PolygonGroupController
+
+import * as com_tab_block_in_map from './com_tab_block_in_map.js'

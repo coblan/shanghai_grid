@@ -1,0 +1,10 @@
+{% extends "jb_admin/table.html" %}
+{% load static %}
+{% load jsonify %}
+{% block extra_head %}
+<link rel="stylesheet" href="http://cache.amap.com/lbs/static/main1119.css"/>
+<script src="http://webapi.amap.com/maps?v=1.3&key=0909294a753dfe00a0aa124b6ecb93eb&plugin=AMap.PolyEditor,AMap.CircleEditor,AMap.MouseTool"></script>
+<script type="text/javascript" src="http://cache.amap.com/lbs/static/addToolbar.js"></script>
+
+<script src='{% static "js/geoscope.pack.js" %}?t={{ js_stamp.geoscope_pack_js }}'></script>
+{% endblock %}

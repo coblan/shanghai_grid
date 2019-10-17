@@ -63,11 +63,121 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 9);
+/******/ 	return __webpack_require__(__webpack_require__.s = 10);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Vue.component('com-tab-block-in-map', {
+    props: ['tab_head', 'par_row'],
+    data: function data() {
+        window.controller = new PolygonGroupController();
+        return {
+            controller: controller
+        };
+    },
+
+    mixins: [field_fun],
+    mounted: function mounted() {
+        init_map();
+        controller.set_drawer(drawer);
+        debugger;
+        controller.set_group(this.par_row.pk);
+        controller.get_items();
+        map.on('click', function () {
+            controller.map_click_callback();
+        });
+    },
+    methods: {
+        item_link: function item_link(name) {
+            if (name != this.crt_tab) {
+                return ex.appendSearch({ _tab: name });
+            } else {
+                return 'javascript:;';
+            }
+        },
+        toggle_fullscreen: function toggle_fullscreen() {
+            if (this.is_fullscreen) {
+                exit_fullscreen();
+            } else {
+                fullscreen();
+            }
+            this.is_fullscreen = !this.is_fullscreen;
+        }
+
+    },
+    template: '<div class="flex flex-grow" style="position: absolute;top:0;left: 0;right: 0;bottom: 0;">\n        <div class="flex-grow" style="position: relative;">\n            <div id="container"></div>\n\n            <div style="position: absolute;right: 2em;top:2em;">\n                <button @click="toggle_fullscreen()" type="button" class="btn btn-primary">\u5168\u5C4F\u5207\u6362</button>\n            </div>\n        </div>\n\n        <polygon-multi-btn-panel class="map-btn-panel" :crt_row="controller.crt_row" :items="controller.items" @new_row="controller.new_row()"></polygon-multi-btn-panel>\n    </div>'
+});
+
+function init_map() {
+    window.editorTool, window.map = new AMap.Map("container", {
+        resizeEnable: true,
+        center: [121.159647, 31.157344], //地图中心点
+        zoom: 13 //地图显示的缩放级别
+    });
+    window.mouseTool = new AMap.MouseTool(map);
+    //        map.setMapStyle('amap://styles/light');
+    window.drawer = {
+        callback: function callback(polygon) {
+            console.log(polygon); //获取路径/范围
+        },
+        show: function show() {
+            there_com.show_map = true;
+            setTimeout(function () {
+                map.setFitView();
+            }, 100);
+        },
+        create_polygon: function create_polygon(callback) {
+
+            this.callback = callback || this.callback;
+            mouseTool.polygon();
+        },
+        insert_polygon: function insert_polygon(arr) {
+            this._polygon = new AMap.Polygon({
+                map: map,
+                path: arr,
+                strokeOpacity: 1,
+                fillOpacity: 0.2,
+                strokeWeight: 1,
+                strokeColor: "#000000",
+                fillColor: "#999"
+            });
+            return this._polygon;
+        },
+        edit_polygon: function edit_polygon(polygon) {
+            if (this._polygonEditor) {
+                this._polygonEditor.close();
+            }
+            this._polygonEditor = new AMap.PolyEditor(map, polygon);
+            this._polygonEditor.open();
+        },
+        close_polygon: function close_polygon() {
+            if (this._polygonEditor) {
+                this._polygonEditor.close();
+            }
+        },
+        submit: function submit() {
+            // 需要设置 drawer.onsubmit
+            var polygon_path = this._polygon.getPath();
+            this.onsubmit(polygon_path);
+        }
+    };
+
+    AMap.event.addListener(mouseTool, 'draw', function (e) {
+        //添加事件
+        //        console.log(e.obj.getPath());//获取路径/范围
+        drawer.callback(e.obj.getPath());
+        mouseTool.close(true);
+    });
+}
+
+/***/ }),
+/* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -100,7 +210,7 @@ window.fullscreen = fullscreen;
 window.exit_fullscreen = exit_fullscreen;
 
 /***/ }),
-/* 1 */
+/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -114,10 +224,18 @@ Object.defineProperty(exports, "__esModule", {
 * */
 
 var map_com = exports.map_com = {
-    template: '<div id="container"></div>',
+    template: "<div id=\"container\"></div>",
     mounted: function mounted() {
         var self = this;
         self.init();
+        //ex.load_css("http://cache.amap.com/lbs/static/main1119.css")
+        //ex.load_js("http://webapi.amap.com/maps?v=1.3&key=0909294a753dfe00a0aa124b6ecb93eb&plugin=AMap.PolyEditor,AMap.CircleEditor,AMap.MouseTool",function(){
+        //    ex.load_js("http://cache.amap.com/lbs/static/addToolbar.js",function(){
+        //        setTimeout(function(){
+        //            self.init()
+        //        },10)
+        //    })
+        //})
     },
     data: function data() {
         return {
@@ -136,15 +254,10 @@ var map_com = exports.map_com = {
             this.on_polygon_click_callback = callback;
         },
         init: function init() {
-            var self = this;
             this.editorTool, this.map = new AMap.Map(this.$el, {
                 resizeEnable: true,
                 center: [116.403322, 39.900255], //地图中心点
                 zoom: 13 //地图显示的缩放级别
-            });
-            self.map.on('complete', function () {
-                // 地图图块加载完成后触发
-                self.$emit('install-over', self);
             });
             if (this.on_init_call) {
                 this.on_init_call();
@@ -219,7 +332,7 @@ var map_com = exports.map_com = {
 });
 
 /***/ }),
-/* 2 */
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -275,7 +388,7 @@ var ploygon_editor = exports.ploygon_editor = {
 };
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -444,6 +557,10 @@ var polygon_multi_btn_panel = exports.polygon_multi_btn_panel = {
             var self = this;
             var row = {};
             ex.assign(row, this.crt_row);
+            if (!row.group) {
+                row.group = controller.group_pk;
+            }
+            debugger;
             if (!row.poly) {
                 alert('请创建一个多边形');
                 return;
@@ -534,7 +651,7 @@ var polygon_multi_btn_panel = exports.polygon_multi_btn_panel = {
 };
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -595,16 +712,16 @@ function shot(ele, callback) {
 window.shot = shot;
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(6);
+var content = __webpack_require__(7);
 if(typeof content === 'string') content = [[module.i, content, '']];
 // add the styles to the DOM
-var update = __webpack_require__(8)(content, {});
+var update = __webpack_require__(9)(content, {});
 if(content.locals) module.exports = content.locals;
 // Hot Module Replacement
 if(false) {
@@ -621,10 +738,10 @@ if(false) {
 }
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(7)();
+exports = module.exports = __webpack_require__(8)();
 // imports
 
 
@@ -635,7 +752,7 @@ exports.push([module.i, ".map-btn-panel {\n  width: 20em;\n  margin: 0.5em;\n  b
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports) {
 
 /*
@@ -691,7 +808,7 @@ module.exports = function() {
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports) {
 
 /*
@@ -943,30 +1060,34 @@ function updateLink(linkElement, obj) {
 
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var _polygon_com = __webpack_require__(2);
+var _polygon_com = __webpack_require__(3);
 
 var polygon_com = _interopRequireWildcard(_polygon_com);
 
-var _polygon_multi_com = __webpack_require__(3);
+var _polygon_multi_com = __webpack_require__(4);
 
-var _map_com = __webpack_require__(1);
+var _map_com = __webpack_require__(2);
 
-var _fullscreen = __webpack_require__(0);
+var _fullscreen = __webpack_require__(1);
 
 var dispatch = _interopRequireWildcard(_fullscreen);
 
-var _shot = __webpack_require__(4);
+var _shot = __webpack_require__(5);
+
+var _com_tab_block_in_map = __webpack_require__(0);
+
+var com_tab_block_in_map = _interopRequireWildcard(_com_tab_block_in_map);
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 //import  {dispatch_panel} from './dispatch_panel_com.js'
-__webpack_require__(5);
+__webpack_require__(6);
 
 Vue.component('polygon-input', polygon_com.ploygon_editor);
 Vue.component('polygon-multi-btn-panel', _polygon_multi_com.polygon_multi_btn_panel);

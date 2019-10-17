@@ -12,6 +12,7 @@ from .polygon import dict2poly,poly2dict
 from helpers.func.collection.container import evalue_container
 from helpers.func.ldatetime import localstr
 from . import  js_cfg
+from . import  draw_fense
 
 class BlockPolygonTablePage(TablePage):
     class BlockPolygonTable(ModelTable):
@@ -84,11 +85,16 @@ class BlockPolygonFormPage(FieldsPage):
                 head['type']='polygon-input'
         
         def save_form(self):
-            inst = super(self.__class__,self).save_form()
+            self.instance.save()
+            #inst = super(self.__class__,self).save_form()
             if hasattr(self,'_group'):
-                self._group.blocks.add(inst)
-            return inst
-            
+                self._group.blocks.add(self.instance)
+        
+        def del_form(self):
+            if self.permit.can_del() and self.instance.pk:
+                self.instance.delete()
+            else:
+                raise PermissionDenied('No permission to delete %s'%str(self.instance))
         
             
     fieldsCls = BlockPolygonForm
