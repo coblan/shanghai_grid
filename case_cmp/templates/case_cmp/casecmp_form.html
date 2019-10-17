@@ -32,8 +32,15 @@
         },
         mixins:[field_fun],
         mounted:function(){
-            var map_com = this.$refs.map_com
-            map_com.on_init(function(){
+//            var map_com = this.$refs.map_com
+//            map_com.on_init(function(){
+//
+//            })
+        },
+        methods:{
+            on_map_install:function(vc){
+                var map_com = vc.map
+
                 var lon= row.loc[0]
                 var lat =  row.loc[1]
                 var marker = new AMap.Marker({
@@ -66,7 +73,7 @@
 
                 })
                 map_com.map.setFitView()
-            })
+            }
         }
 
     }
@@ -130,7 +137,7 @@
             </ul>
         </div>
         <div class="flex-grow" style="position: relative;">
-            <com-map ref="map_com"></com-map>
+            <com-map ref="map_com" @install-over="on_map_install($event)"></com-map>
         </div>
     </div>
 

@@ -7,15 +7,6 @@ export var map_com = {
     mounted:function(){
         var self=this
         self.init()
-        //ex.load_css("http://cache.amap.com/lbs/static/main1119.css")
-        //ex.load_js("http://webapi.amap.com/maps?v=1.3&key=0909294a753dfe00a0aa124b6ecb93eb&plugin=AMap.PolyEditor,AMap.CircleEditor,AMap.MouseTool",function(){
-        //    ex.load_js("http://cache.amap.com/lbs/static/addToolbar.js",function(){
-        //        setTimeout(function(){
-        //            self.init()
-        //        },10)
-        //    })
-        //})
-
     },
     data:function(){
       return {
@@ -34,10 +25,15 @@ export var map_com = {
           this.on_polygon_click_callback=callback
         },
         init:function(){
+            var self=this
             this.editorTool,this.map = new AMap.Map(this.$el, {
                 resizeEnable: true,
                 center: [116.403322, 39.900255],//地图中心点
                 zoom: 13 //地图显示的缩放级别
+            });
+            self.map.on('complete', function(){
+                // 地图图块加载完成后触发
+                self.$emit('install-over',self)
             });
             if(this.on_init_call){
                 this.on_init_call()
